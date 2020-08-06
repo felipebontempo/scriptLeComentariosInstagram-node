@@ -10,7 +10,7 @@ async function start(){
         if(moreButton){ //Se ainda existir mais botões 'more' continue
             console.log("More");
             await moreButton.click() //Clica no botão
-            await page.waitFor(selector, {timeout: 3000}).catch(() => {console.log("timeout")})
+            await page.waitFor(selector, {timeout: 3000}).catch(() => {console.log("timeout")}) //O timeout aqui é apenas para aguardar para ver se realmente não consta mais botões 'mais' e se nao tiver, segue o fluxo.
             await loadMore(page, selector)
         }
     }
@@ -28,55 +28,16 @@ async function start(){
 
     await loadMore(page, '.dCJp8') //Página carregada, eu vou clicando no botão 'MAIS' (.dCJp8) é uma classe de CSS dentro do HTML em questão.
 
-    //Array de comentários (string)
-    const comments = await getComments(page, '.C4VMK span a')//Usando a função criada 'getComments', passo a 'pagina' e no segundo parametro informo o tag que quero buscar, no caso estou buscando uma classe no HTMl chamada 'C4VMK' e dentro dela busco um elemento filho chamado SPAN e dentro desse filho um elemento 'a' (que é um LINK)
-    console.log(comments); //Voa lá!
     
+    const comments = await getComments(page, '.C4VMK span a')//Usando a função criada 'getComments', passo a 'pagina' e no segundo parametro informo o tag que quero buscar, no caso estou buscando uma classe no HTMl chamada 'C4VMK' e dentro dela busco um elemento filho chamado SPAN e dentro desse filho um elemento 'a' (que é um LINK).//Array de comentários (string, usersArroba)
+
+    const contado = conte(comments); //'contado' recebe um objeto com varias propriedades, calma que eles não estou ordenados, mas o valor de cada propriedade é o número de vezes que esse 'arrobaUser' aparece nos comentários do post.
+    const sorted = sort(contado) //Eu pego esse objeto gigante e ordeno ele com base no valor da propriedade, e por fim guardo essa lista ordenada em um array e salvo na variavel 'sorted'.
+    sorted.forEach(comment => {console.log(comment);}) //Agora sim, pego a lista ordenada e exibo no console cada arrobaUser e o número de vezes que ele aparece nos comentários.  
+    //console.log(comments); //Voa lá!
+
+    await browser.close() //Fecho o navegador depois do processo.
 }
-
-//Pegar os comentários / listaUserArrobas
-//Array de TESTE
-const fakeArrobas = [
-    '@Cenoane',
-    '@Poudedi',
-    '@Vinaicu',
-    '@Ziadiha',
-    '@Usheybu',
-    '@Woebuil',
-    '@Beotozo',
-    '@Bresebo',
-    '@Raualna',
-    '@Clocawe',
-    '@Boculol',
-    '@Seroyfo',
-    '@Hoirunr',
-    '@Celiufe',
-    '@Bresebo',
-    '@Osvealr',
-    '@Luatoel',
-    '@Gyekumi',
-    '@Bareabi',
-    '@Dualaol',
-    '@Nupufiu',
-    '@Bresebo',
-    '@Cefluzu',
-    '@Luzifie',
-    '@Ziadiha',
-    '@Cakuatu',
-    '@Guodiel',
-    '@Blenigo',
-    '@Kocliwo',
-    '@Pozeuwu',
-    '@Ziadiha',
-    '@Bresebo',
-    '@Olisveo',
-    '@Ziadiha',
-    '@Higuodi'
-]
-
-//console.log(fakeArrobas.length);
-
-// Contar listaUserArrobas repetidas
 
 function conte(arrobas) {
     const conte = {}//isso é um obj, vazio!
@@ -98,7 +59,8 @@ function sort(contado) {
     }
     const ordenado = entries.sort((a, b) => b[1] - a[1]) //OBS: Quando as chaves estão inseridas no codigo -> (a, b) => {b[1] - a[1]} quer dizer que vc não está retornando um valor, isso é proprio das funções de setas, vc também pode deixar as chaves -> {} e adicionar um 'return' que o resultado é retornado.
     //Agora observe o seguinte, 'entries' é um array que nele contem arrays menores ...no qual cada um deles contem dois itens, como eu quero ordenar o array principal com base em um dos itens do array menores eu faço dessa forma b[1] - a[1], eu estou pegando o segundo valor de cada mini-array que está dentro do grande array, se cada mini-array tivesse três elemento e quisesse ordenar pelo terceiro elemento eu deixaria o valor 2.
-    console.log(ordenado);
+    //console.log(ordenado);
+    return ordenado
 }
 
 //sort(conte(fakeArrobas))
