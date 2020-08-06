@@ -1,4 +1,38 @@
+const puppeteer = require('puppeteer');
+
 //Ler páginas do Insta
+
+async function start(){
+
+    //Função que busca um determinado seletor em uma página, e clica no botão MAIS, até acabar.
+    async function loadMore(page, selector) {
+        const moreButton = await page.$(selector) // o '$' indica que eu quero pegar a primeira ocorrencia.
+        if(moreButton){ //Se ainda existir mais botões 'more' continue
+            console.log("More");
+            await moreButton.click() //Clica no botão
+            await page.waitFor(selector, {timeout: 3000}).catch(() => {console.log("timeout")})
+            await loadMore(page, selector)
+        }
+    }
+
+    //Pegar os comentários
+    async function getComments(page, selector){
+        const comments = await page.$$eval(selector, links => links.map(link => link.innerText)) // o '$$' indica que eu quero pegar todas as ocorrencias, e usando o EVAL logo em seguida estou indicando que quero já tratar os dados retornados, no caso posso passar uma função para ser execurada, no caso estou usando um MAP para transformar o resultado recebido do selector.
+        return comments
+    }
+
+    //A receita começa aqui
+    const browser = await puppeteer.launch() //launch é uma promisse, como só quero continuar depois que esse método for executado vou usar um await
+    const page = await browser.newPage() ; //page recebe uma instancia de um browser (navegador rs)
+    await page.goto('https://www.instagram.com/p/CChMVvQgYKK/') //o 'goto' é 'vá para', tipo quando vc digita o endereço do site e aperta o ENTER.
+
+    await loadMore(page, '.dCJp8') //Página carregada, eu vou clicando no botão 'MAIS' (.dCJp8) é uma classe de CSS dentro do HTML em questão.
+
+    //Array de comentários (string)
+    const comments = await getComments(page, '.C4VMK span a')//Usando a função criada 'getComments', passo a 'pagina' e no segundo parametro informo o tag que quero buscar, no caso estou buscando uma classe no HTMl chamada 'C4VMK' e dentro dela busco um elemento filho chamado SPAN e dentro desse filho um elemento 'a' (que é um LINK)
+    console.log(comments); //Voa lá!
+    
+}
 
 //Pegar os comentários / listaUserArrobas
 //Array de TESTE
@@ -67,4 +101,6 @@ function sort(contado) {
     console.log(ordenado);
 }
 
-sort(conte(fakeArrobas))
+//sort(conte(fakeArrobas))
+
+start()
